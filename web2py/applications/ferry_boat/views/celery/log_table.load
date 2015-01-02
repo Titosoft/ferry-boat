@@ -1,0 +1,20 @@
+<div class="col-md-12">
+    <button onclick="ajax('{{=URL('celery', 'clear_logs')}}', [], '')" type="button" class="btn btn-default pull-right" aria-label="Left Align">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Clear Logs
+    </button>
+    <table class="table table-hover table-condensed">
+        <tr>
+            <th class="col-md-2">Date</th><th class="col-md-1">Level</th><th class="col-md-8">Message</th>
+        </tr>
+        {{for l in logs:}}
+        {{date=l.split('||')[0]}}
+        {{level=l.split('||')[1]}}
+        {{message=l.split('||')[2]}}
+        <tr class={{if level.strip() == "ERROR":}}"danger"{{else:}}"{{=level.lower()}}"{{pass}}>
+            <td>{{=date}}</td>
+            <td>{{=level}}</td>
+            <td>{{=message}}</td>
+        </tr>
+        {{pass}}
+    </table>
+</div>

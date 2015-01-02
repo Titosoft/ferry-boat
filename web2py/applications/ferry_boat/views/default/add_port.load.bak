@@ -1,0 +1,24 @@
+<table class="table">
+    <tr>
+        <th>Host port</th><th>Container port</th><td></td>
+    </tr>
+    {{for v in ports:}}
+    <tr>
+        <td>{{=v['host_port']}}</td><td>{{=v['container_port']}}</td><td><a class="btn btn-danger btn-xs" href="{{=URL('delete_port',args=v.id)}}"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+    </tr>
+    {{pass}}
+</table>
+{{=form.custom.begin}}
+<div class="form-group col-lg-6">
+    {{form.custom.widget.host_port['_placeholder']=form.custom.label.host_port}}
+    {{form.custom.widget.host_port['_class']='form-control'}}
+    {{=form.custom.widget.host_port}}
+</div>
+
+<div class="form-group col-lg-6">
+    {{form.custom.widget.container_port['_placeholder']=form.custom.label.container_port}}
+    {{form.custom.widget.container_port['_class']='form-control'}}
+    {{=form.custom.widget.container_port}}
+</div>
+<button type="submit" class="btn btn-primary">Add</button>
+{{=form.custom.end}}

@@ -1,0 +1,73 @@
+{{extend 'layout.html'}}
+<script>
+    $( document ).ready(function() {
+        $('#iconpicker').on('change', function(e) {
+            $('#my_image_glyphicon').val(e.icon);
+        });
+    });
+</script>
+<h1>New Image</h1>
+<div class="col-md-6">
+    {{=form.custom.begin}}
+    <div class="form-group col-lg-12">
+        <label>{{=form.custom.label.name}}</label>
+        {{form.custom.widget.name['_class']='form-control'}}
+        {{=form.custom.widget.name}}
+    </div>
+
+    <div class="form-group col-lg-12">
+        <label>{{=form.custom.label.docker_name}}</label>
+        {{form.custom.widget.docker_name['_class']='form-control'}}
+        {{=form.custom.widget.docker_name}}
+    </div>
+    <div class="form-group col-lg-12">
+        <label>{{=form.custom.label.default_tag}}</label>
+        {{form.custom.widget.default_tag['_class']='form-control'}}
+        {{=form.custom.widget.default_tag}}
+    </div>
+    <div class="form-group col-lg-8">
+        <div class="input-group">
+            {{form.custom.widget.glyphicon['_class']='form-control'}}
+            {{form.custom.widget.glyphicon['_placeholder']='Choose a icon or Upload it ->'}}
+            {{=form.custom.widget.glyphicon}}
+            <span class="input-group-btn">
+                <button id="iconpicker" class="btn btn-default" data-iconset="glyphicon" data-icon="glyphicon-hdd" role="iconpicker"></button>
+            </span>
+        </div>
+    </div>
+    <div class="form-group col-lg-4">
+        {{form.custom.widget.glyphicon['_placeholder']='Choose a icon'}}
+        {{=form.custom.widget.icon}}
+    </div>
+    <div class="form-group col-sm-6">
+        <label>{{=form.custom.label.command}}</label>
+        {{form.custom.widget.command['_class']='form-control'}}
+        {{=form.custom.widget.command}}
+    </div>
+    <div class="form-group col-sm-6">
+        {{=form.custom.widget.random_port}} Expose Random Ports?
+    </div>
+    <div class="form-group col-sm-12">
+        <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+    {{=form.custom.end}}
+</div>
+<div class="col-md-6">
+    <!-- Cool info about the image? Fetch from Registry? -->
+</div>
+<div class="col-md-12">
+    <div class="col-md-6">
+        <h3 class="dark-grey">Volumes</h3>
+        <div id="volumes">
+            {{=LOAD('default','add_volume.load',args=image.id, target='volumes',ajax=True)}}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h3>
+            Ports
+        </h3>
+        <div id="ports">
+            {{=LOAD('default','add_port.load',args=image.id, target='volumes',ajax=True)}}
+        </div>
+    </div>
+</div>

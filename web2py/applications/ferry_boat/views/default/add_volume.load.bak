@@ -1,0 +1,33 @@
+<table class="table">
+    <tr>
+        <th>Host Path</th><th>Container Path</th><td></td>
+    </tr>
+    {{for v in volumes:}}
+    <tr>
+        <td>{{=v['host_path']}}</td><td>{{=v['container_path']}}</td><td>
+        {{delete_url=URL('delete_volume',args=[v['id'],{{=request.args(1)}}])}}
+        <button onclick="$.ajax({url: '{{=delete_url}}'});" type="button" class="btn btn-danger" aria-label="Left Align">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </button>
+        </td>
+    </tr>
+    {{pass}}
+</table>
+{{=form.custom.begin}}
+<div class="form-group col-lg-5">
+    {{form.custom.widget.host_path['_placeholder']=form.custom.label.host_path}}
+    {{form.custom.widget.host_path['_class']='form-control'}}
+    {{=form.custom.widget.host_path}}
+</div>
+
+<div class="form-group col-lg-5">
+    {{form.custom.widget.container_path['_placeholder']=form.custom.label.container_path}}
+    {{form.custom.widget.container_path['_class']='form-control'}}
+    {{=form.custom.widget.container_path}}
+</div>
+<div class="form-group col-lg-1">
+    {{form.custom.widget.rw['_class']='form-control'}}
+    {{=form.custom.widget.rw}} RW
+</div>
+<button type="submit" class="btn btn-primary">Add</button>
+{{=form.custom.end}}

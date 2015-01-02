@@ -1,0 +1,26 @@
+{{extend 'layout.html'}}
+<div class="col-md-12">
+    <h1>Images</h1>
+    <a class="btn btn-info" href="{{=URL('new_image')}}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New</a>
+    <table class="table table-striped">
+        <tr><th>Name</th><th>Docker Name</th><th>Icon</th><th>Expose Random Port</th><th>Command</th><th>Action</th></tr>
+        {{for i in images:}}
+        <tr>
+            <td>{{=i.name}}</td>
+            <td>{{=i.docker_name}}</td>
+            <td>
+                {{if i.glyphicon:}}
+                <h1 style="display: inline;"><i data-toggle="tooltip" title="{{=i.name}}" class="glyphicon {{=i.glyphicon}}"></i></h1>
+                {{elif i.icon:}}
+                <img data-toggle="tooltip" title="{{=i.name}}" src="{{=URL('download', args=i.icon)}}" />
+                {{else:}}
+                <h1 style="display: inline;"><i data-toggle="tooltip" title="{{=i.name}}" class="glyphicon glyphicon-hdd"></i></h1>
+                {{pass}}
+            </td>
+            <td>{{=i.random_port}}</td>
+            <td>{{=i.command}}</td>
+            <td><a class="btn btn-primary" href="{{=URL('config_image', args=i.id)}}"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a></td>
+        </tr>
+        {{pass}}
+    </table>
+</div>

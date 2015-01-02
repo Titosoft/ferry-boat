@@ -1,0 +1,12 @@
+c
+c.logs('0e91d223f5c1')
+XML(c.logs('0e91d223f5c1'))
+print XML(c.logs('0e91d223f5c1'))
+print XML(c.attach('0e91d223f5c1'))
+print XML(c.attach('4203cb5c8e21'))
+print XML(c.logs('4203cb5c8e21'))
+print xmlescape(c.logs('4203cb5c8e21'))
+XML(c.logs('0e91d223f5c1'))
+c.logs('0e91d223f5c1')
+BEAUTIFY(c.logs('0e91d223f5c1'))
+print BEAUTIFY(c.logs('0e91d223f5c1'))

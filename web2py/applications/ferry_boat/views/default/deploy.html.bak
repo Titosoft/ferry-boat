@@ -1,0 +1,115 @@
+{{extend 'layout.html'}}
+<script>
+    $(document).ready(function() {
+        $('#no_table_use_default').click(function() {
+            if( $(this).is(':checked')) {
+                $(".specific_config").hide();
+            } else {
+                $(".specific_config").show();
+            }
+        });
+        if( $('#no_table_use_default').is(':checked')) {
+            $(".specific_config").hide();
+        }
+
+        $("[name='add_row']").on("click", function() {
+            // Dynamic Rows Code
+            var table_id = $(this).data('table');
+            // Get max row id and set new id
+            var newid = 0;
+            $.each($("#"+table_id+" tr"), function() {
+                if (parseInt($(this).data("id")) > newid) {
+                    newid = parseInt($(this).data("id"));
+                }
+            });
+            newid++;
+
+            var tr = $("<tr></tr>", {
+                id: "addr"+newid,
+                "data-id": newid
+            });
+
+            // loop through each td and create new elements with name of newid
+            $.each($("#"+table_id+" tbody tr:nth(0) td"), function() {
+                var cur_td = $(this);
+
+                var children = cur_td.children();
+
+                // add new td and element if it has a nane
+                if ($(this).data("name") != undefined) {
+                    var td = $("<td></td>", {
+                        "data-name": $(cur_td).data("name")
+                    });
+
+                    var c = $(cur_td).find($(children[0]).prop('tagName')).clone();
+                    c.attr("name", $(cur_td).data("name") + '[]');
+                    c.appendTo($(td));
+                    td.appendTo($(tr));
+                } else {
+                    var td = $("<td></td>", {
+                        'text': $('#'+table_id+' tr').length
+                    }).appendTo($(tr));
+                }
+            });
+
+            // add the new row
+            $(tr).appendTo($("#"+table_id));
+
+            $(tr).find("td button.row-remove").on("click", function() {
+                $(this).closest("tr").remove();
+            });
+        });
+
+    });
+</script>
+<h1>Deploy new app</h1>
+<div class="col-md-12">
+    {{=form.custom.begin}}
+    <div class="form-group col-lg-12">
+        <button type="submit" class="pull-right btn btn-primary">Save</button>
+    </div>
+    <div class="form-group col-lg-6">
+        <label>{{=form.custom.label.name}}</label>
+        {{form.custom.widget.name['_class']='form-control'}}
+        {{=form.custom.widget.name}}
+    </div>
+
+    <div class="form-group col-lg-5">
+        <label>{{=form.custom.label.image}}</label>
+        {{form.custom.widget.image['_class']='form-control'}}
+        {{=form.custom.widget.image}}
+    </div>
+    <div class="form-group col-lg-1 specific_config">
+        <label>{{=form.custom.label.tag}}</label>
+        {{form.custom.widget.tag['_class']='form-control'}}
+        {{=form.custom.widget.tag}}
+    </div>
+    <div class="form-group col-lg-12">
+        {{=form.custom.widget.use_default}} Use default image config
+    </div>
+    <div class="form-group col-sm-6 specific_config">
+        {{=form.custom.widget.random_port}} Expose All Ports?
+    </div>
+    <div class="form-group col-sm-6 specific_config">
+        <label>{{=form.custom.label.command}}</label>
+        {{form.custom.widget.command['_class']='form-control'}}
+        {{=form.custom.widget.command}}
+    </div>
+    <div class="form-group col-lg-6 specific_config">
+        <label>Exposed Ports</label>
+        <div id="ports">
+            {{=LOAD('default','add_port.load',args=[None,'session'], target='ports',ajax=True)}}
+        </div>    </div>
+    <div class="form-group col-lg-6 specific_config">
+        <label>Volumes</label>
+        <div id="ports">
+            {{=LOAD('default','add_volume.load',ajax=True, args=[None,'session'], target='volumes')}}
+        </div>
+    </div>
+    <div class="form-group col-lg-6 specific_config">
+        <label>Environment Variables</label>
+        <div id="ports">
+            {{=LOAD('default','add_env.load', target='envs',ajax=True)}}
+        </div>
+        {{=form.custom.end}}
+    </div>

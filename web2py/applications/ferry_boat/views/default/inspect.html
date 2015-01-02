@@ -1,0 +1,133 @@
+{{extend 'layout.html'}}
+<h1>{{icon=db.my_image(db.my_image.docker_name==details['Config']['Image'].split(':')[0].split('/')[-1])}}
+    {{if icon:}}
+    {{if icon.glyphicon:}}
+    <i data-toggle="tooltip" title="{{=icon.name}}" class="glyphicon {{=icon.glyphicon}}"></i>
+    {{else:}}
+    <img data-toggle="tooltip" title="{{=icon.name}}" src="{{=URL('download', args=icon.icon)}}" />
+    {{pass}}
+    {{else:}}
+    <i data-toggle="tooltip" title="{{=details['Config']['Image']}}" class="glyphicon glyphicon-hdd"></i>
+    {{pass}}
+    {{=details['Name']}}
+</h1>
+<div class="row">
+    <div class="col-xs-6 col-md-6">
+        <table class="table">
+            <tr>
+                <th>Domains</th><td>{{=domains}}</td>
+            </tr>
+            <tr>
+                <th>ID</th><td>{{=details['Id']}}</td>
+            </tr>
+            <tr>
+                <th>Image</th><td>{{=details['Config']['Image']}}</td>
+            </tr>
+            <tr>
+                <td colspan=2>
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a href="{{=URL('start',args=details['Id'])}}" class="btn btn-success"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span> Start</a>
+                        <a href="{{=URL('restart',args=details['Id'])}}" class="btn btn-info"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Restart</a>
+                        <a href="{{=URL('stop',args=details['Id'])}}" class="btn btn-warning"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span> Stop</a>
+                        <a href="{{=URL('kill',args=details['Id'])}}" class="btn btn-warning"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Kill</a>
+                        <a href="{{=URL('remove',args=details['Id'])}}" class="btn btn-danger"><span class="glyphicon glyphicon-fire" aria-hidden="true"></span> Delete</a>
+                    </div>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <table class="table">
+            <tr>
+                <th>Status</th>
+                <td class="col-md-8" colspan="3">{{if details['State']['Running']:}}
+                    <button type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span> Running
+                    </button>
+                    {{elif details['State']['Paused']:}}
+                    <button type="button" class="btn btn-info">
+                        <span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Paused
+                    </button>
+                    {{else:}}
+                    <button type="button" class="btn btn-danger">
+                        <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> Down :(
+                    </button>
+                    {{pass}}
+
+                </td>
+            </tr>
+            <tr>
+                <th>PID</th><td colspan="3">{{=details['State']['Pid']}}</td>
+            </tr>
+            <tr>
+                <th>CPU Shares</th><td class="col-md-4">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="{{=(1024-details['Config']['CpuShares'])*100/1024}}" aria-valuemin="0" aria-valuemax="100" style="width: {{=(1024-details['Config']['CpuShares'])*100/1024}}%;">
+                        {{=(1024-details['Config']['CpuShares'])*100/1024}} %
+                    </div>
+                </div>
+                </td>
+                <th>CPU Set</th><td>{{=details['Config']['Cpuset']}}</td>
+            </tr>
+            <tr>
+                <th>Memory Limit</th><td colspan="3">{{=details['Config']['Memory']}}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6 col-md-6">
+        <h2> Network </h2>
+        <table class="table table-condensed">
+            <tr>
+                <th>Interface:</th><td>{{=details['NetworkSettings']['Bridge']}}</td>
+            </tr>
+            <tr><th>IP Address:</th><td>{{=details['NetworkSettings']['IPAddress']}}</td></tr>
+            <tr><th>MAC Address:</th><td>{{=details['NetworkSettings']['MacAddress']}}</td></tr>
+            {{if details['NetworkSettings']['Ports']:}}
+            <tr>
+                <th>Ports:</th>
+                <td>{{for k,v in details['NetworkSettings']['Ports'].iteritems():}}
+                {{=k}} {{if v:}}-> {{=details['NetworkSettings']['Ports'][k][0]['HostPort']}}{{pass}} | 
+                {{pass}}
+                </td>
+            </tr>
+            {{pass}}
+        </table>
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <h2> Volumes </h2>
+        <table class="table table-condensed">
+            <th>Container</th><th>Host</th><th>RW</th>
+            {{for k,v in details['Volumes'].iteritems():}}
+            <tr>
+                <td>{{=k}}</td><td>{{=v}}</td><td>{{=details['VolumesRW'][k]}}</td>
+            </tr>
+            {{pass}}
+        </table>
+    </div>
+</div>
+{{if processes:}}
+<div class="row">
+    <h2> Processes </h2>
+    <table class="table table-condensed table-hover table-bordered">
+        <thead>
+            <tr>
+                {{for p in processes['Titles']:}}
+                <th>{{=p}}</th>
+                {{pass}}
+            </tr>
+        </thead>
+        {{for p in processes['Processes']:}}
+        <tr>
+            {{=XML(''.join(['<td>'+i+'</td>' for i in p]))}}
+        </tr>
+        {{pass}}
+    </table>
+</div>
+{{pass}}
+<div class="row">
+    <h2> Logs </h2>
+    {{=PRE(logs,_style="white-space:pre-wrap;max-height: 400px;height: auto;overflow: auto;")}}
+</div>
