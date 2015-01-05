@@ -149,8 +149,8 @@ def delete_port():
 
 def add_env():
     form = SQLFORM.factory(
-        Field('key', requires=IS_NOT_EMPTY()),
-        Field('value', requires=IS_NOT_EMPTY())
+        Field('key', requires=[IS_NOT_EMPTY()]),
+        Field('value', requires=[IS_NOT_EMPTY()])
         ,submit_button='Add',formname="add_envs")
     envs=session.envs
     if form.validate():
