@@ -13,7 +13,7 @@ formatter = logging.Formatter('%(asctime)s || %(levelname)s || %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
-app = Celery('tasks', backend='amqp', broker='amqp://')
+app = Celery('tasks', backend='amqp', broker='amqp://'+os.environ['MQ_PORT_5672_TCP_ADDR']+':'+os.environ['MQ_PORT_5672_TCP_PORT'])
 c = Client(base_url='unix://var/run/docker.sock')
 
 @app.task
