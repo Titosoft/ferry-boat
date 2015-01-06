@@ -9,6 +9,7 @@
 ## - api is an example of Hypermedia API support and access control
 #########################################################################
 
+@auth.requires_login()
 def index():
     """
     example action using the internationalization operator T and flash
@@ -24,6 +25,7 @@ def index():
     docker_info=c.info()
     return dict(containers=containers,host=host,host_usage=host_usage,docker_info=docker_info)
 
+@auth.requires_login()
 def inspect():
     c_id=request.args(0)
     details=c.inspect_container(c_id)
@@ -42,29 +44,34 @@ def inspect():
             domains=i.get('VIRTUAL_HOST')
     return dict(details=details,domains=domains,logs=logs,processes=processes)
 
+@auth.requires_login()
 def start():
     c_id=request.args(0)
     start=c.start(c_id)
     session.flash='app started'
     redirect(URL('index'))
 
+@auth.requires_login()
 def stop():
     c_id=request.args(0)
     stop=c.stop(c_id)
     session.flash='app stopped'
     redirect(URL('index'))
 
+@auth.requires_login()
 def restart():
     c_id=request.args(0)
     restart=c.restart(c_id)
     session.flash='app restarted'
     redirect(URL('index'))
 
+@auth.requires_login()
 def kill():
     c_id=request.args(0)
     kill=c.restart(c_id)
     redirect(URL('index'))
 
+@auth.requires_login()
 def remove():
     c_id=request.args(0)
     try:
@@ -74,10 +81,12 @@ def remove():
         session.flash='Stop the container first'
     redirect(URL('index'))
 
+@auth.requires_login()
 def my_images():
     images=db(db.my_image.id>0).select()
     return dict(images=images)
 
+@auth.requires_login()
 def new_image():
     form=SQLFORM(db.my_image,submit_button='Next')
     if form.process().accepted:
@@ -87,6 +96,7 @@ def new_image():
 
     return dict(form=form)
 
+@auth.requires_login()
 def add_volume():
     image_id=request.args(0)
     form=SQLFORM(db.volumes,formname="add_volumes",fields=['host_path','container_path','rw'],submit_button='Add')
@@ -105,6 +115,7 @@ def add_volume():
             response.flash = 'form has errors'
     return dict(form=form,volumes=volumes)
 
+@auth.requires_login()
 def delete_volume():
     v_id=request.args(0)
     if request.args(1) == 'session':
@@ -117,6 +128,7 @@ def delete_volume():
         db(db.volumes.id==v_id).delete()
         response.js =  "jQuery('#%s').get(0).reload()" % 'volumes'
 
+@auth.requires_login()
 def add_port():
     image_id=request.args(0)
     form=SQLFORM(db.ports,formname="add_ports",fields=['host_port','container_port',],submit_button='Add')
@@ -135,6 +147,7 @@ def add_port():
             response.flash = 'form has errors'
     return dict(form=form,ports=ports)
 
+@auth.requires_login()
 def delete_port():
     v_id=request.args(0)
     if request.args(1) == 'session':
@@ -147,6 +160,7 @@ def delete_port():
         db(db.ports.id==v_id).delete()
         response.js =  "jQuery('#%s').get(0).reload()" % 'ports'
 
+@auth.requires_login()
 def add_env():
     form = SQLFORM.factory(
         Field('key', requires=[IS_NOT_EMPTY()]),
@@ -159,6 +173,7 @@ def add_env():
         response.flash = 'form has errors'
     return dict(form=form,envs=envs)
 
+@auth.requires_login()
 def delete_env():
     v_id=request.args(0)
     session.envs.pop(int(v_id))
@@ -166,6 +181,7 @@ def delete_env():
         i['id']=c
     response.js = "jQuery('#%s').get(0).reload()" % 'envs'
 
+@auth.requires_login()
 def config_image():
     image_id=request.args(0)
     image=db.my_image(image_id)
@@ -179,6 +195,7 @@ def config_image():
 
     return dict(form=form,image=image)
 
+@auth.requires_login()
 def deploy():
     from docker_tasks import create_start
     create=start=''
@@ -253,6 +270,21 @@ def deploy():
         session.envs=[]
     return dict(form=form,v=request.vars,volumes=volumes,binds=binds,ports=ports,port_bindings=port_bindings,environment=environment,create=create,start=start)
 
+def settings():
+    import os
+    form = SQLFORM.factory(
+        Field('settings', 'text', requires=IS_NOT_EMPTY()),submit_button="Save")
+    fp=open(os.path.join(request.env.web2py_path,'applications','ferry_boat','private','settings.ini'))
+    form.vars.settings=fp.read()
+    fp.close()
+    if form.process(keepvalues=True).accepted:
+        new_config=open(os.path.join(request.env.web2py_path,'applications','ferry_boat','private','settings.ini'),'w')
+        new_config.write(form.vars.settings)
+        new_config.close()
+    elif form.errors:
+        response.flash = 'form has errors'
+    return dict(form=form)
+
 def user():
     """
     exposes:
@@ -290,7 +322,7 @@ def call():
     return service()
 
 
-@auth.requires_login() 
+@auth.requires_login()
 def api():
     """
     this is example of API with access control
